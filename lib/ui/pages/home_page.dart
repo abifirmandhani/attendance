@@ -9,125 +9,226 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: MapWidget(),
-      ),
+      body: HomeWidget(),
     );
   }
 }
 
-class MapWidget extends StatefulWidget {
+class HomeWidget extends StatefulWidget {
   @override
-  _MapWidgetState createState() => _MapWidgetState();
+  _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _MapWidgetState extends State<MapWidget> {
-  GoogleMapController mapController;
+class _HomeWidgetState extends State<HomeWidget> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<JadwalBloc>().add(FetchJadwal());
+  }
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  Widget cek(var data) {
+    print(data is UserLoaded ? data.guru.Alamat : "kosong");
+    return Text("asd");
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(children: <Widget>[
-        SizedBox.expand(
-            child: GoogleMap(
-          initialCameraPosition: _kGooglePlex,
-          mapType: MapType.normal,
-          onMapCreated: (GoogleMapController controller) {
-            mapController = controller;
-          },
-        )),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.all(20),
-            child: Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "200 meter",
-                    style: blackFonts.copyWith(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w700,
-                        color: accentColor),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.add_a_photo_outlined),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text("Ambil Foto")
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.withOpacity(0.6)),
-                        borderRadius: BorderRadius.all(Radius.circular(12))),
-                    child: Padding(
-                      padding: EdgeInsets.all(5),
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (BuildContext context, userState) {
+        return BlocBuilder<JadwalBloc, JadwalState>(
+            builder: (BuildContext context, jadwalState) {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "ePresensi",
+                      style: blackFonts.copyWith(
+                          fontSize: 25, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: mainColor),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            child: Row(
-                              children: [
-                                Icon(Icons.image),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text("Foto kelas.jpg")
-                              ],
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userState is UserLoaded
+                                    ? userState.guru.Nama
+                                    : ".....",
+                                style: blackNumberFonts.copyWith(
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                userState is UserLoaded
+                                    ? userState.guru.Nip ?? "...."
+                                    : ".....",
+                                style: blackNumberFonts.copyWith(
+                                    color: Colors.white),
+                              )
+                            ],
                           ),
-                          Icon(Icons.close)
+                          Container(
+                            width: 50,
+                            height: 50,
+                            child: ClipOval(
+                              child: Image.asset("assets/base.png"),
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.all(Radius.circular(12))),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        child: Center(
-                          child: Text(
-                            "ABSEN",
-                            style: blackFonts.copyWith(color: Colors.white),
-                          ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Container(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: EdgeInsets.all(15),
+                          child: jadwalState is JadwalLoad
+                              ? SpinKitFadingCircle(color: mainColor)
+                              : jadwalState is JadwalEmpty
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Lottie.asset("assets/empty.json",
+                                            width: 100, height: 100),
+                                        Text("Tidak ada jadwal", style: blackFonts.copyWith(fontSize: 16),)
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              jadwalState is JadwalLoaded
+                                                  ? jadwalState
+                                                      .listJadwal[0].NamaMapel
+                                                  : "",
+                                              style: blackFonts.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 18),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.3),
+                                                    width: 1),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                jadwalState is JadwalLoaded
+                                                    ? jadwalState
+                                                        .listJadwal[0].NamaKelas
+                                                    : "",
+                                                style:
+                                                    blackNumberFonts.copyWith(
+                                                        color: accentColor,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.alarm),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              jadwalState is JadwalLoaded
+                                                  ? jadwalState
+                                                      .listJadwal[0].Jam
+                                                  : "",
+                                              style: blackNumberFonts.copyWith(
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.calendar_today),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              jadwalState is JadwalLoaded
+                                                  ? jadwalState
+                                                      .listJadwal[0].Hari
+                                                  : "",
+                                              style: blackNumberFonts.copyWith(
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.notes),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              "3 Jam pelajaran",
+                                              style: blackNumberFonts.copyWith(
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        )
+                                      ],
+                                    ),
                         ),
                       ),
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: 10,
+                    ),
+                    ButtonWidget("Absensi", mainColor, () {
+                      Navigator.pushNamed(context, MapRoute);
+                    })
+                  ],
+                ),
               ),
             ),
-          ),
-        )
-      ]),
+          );
+        });
+      },
     );
   }
 }

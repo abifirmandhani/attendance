@@ -1,30 +1,38 @@
 import 'dart:async';
 
+import 'package:absensi/services/services.dart';
 import 'package:absensi/shared/shareds.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'bloc/jadwal_bloc.dart';
+import 'bloc/user_bloc.dart';
 import 'router.dart' as router;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await UserPreference().init();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: mainColor,
-        accentColor: accentColor,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
-      onGenerateRoute: router.generateRoute,
-      initialRoute: LoginRoute,
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => UserBloc()),
+          BlocProvider(create: (_) => JadwalBloc())
+        ],
+        child: MaterialApp(
+          theme: ThemeData(
+            primaryColor: mainColor,
+            accentColor: accentColor,
+          ),
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: router.generateRoute,
+          initialRoute: LoginRoute,
+        ));
   }
 }
 
@@ -90,81 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: MaterialApp(
-      title: "Demo maps",
-      debugShowCheckedModeBanner: false,
-      home: MapSample(),
-    ) // This trailing comma makes auto-formatting nicer for build methods.
+    return Scaffold(body: Container()
+        // s trailing comma makes auto-formatting nicer for build methods.
         );
-  }
-}
-
-class MapSample extends StatefulWidget {
-  @override
-  _MapSampleState createState() => _MapSampleState();
-}
-
-class _MapSampleState extends State<MapSample> {
-  GoogleMapController mapController;
-
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
-
-  var initHeight = 0.25;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          SizedBox.expand(
-            child: GoogleMap(
-              initialCameraPosition: _kGooglePlex,
-              mapType: MapType.normal,
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-              },
-            ),
-          ),
-          SizedBox.expand(
-            child: DraggableScrollableSheet(
-                initialChildSize: initHeight,
-                minChildSize: 0.12,
-                maxChildSize: 0.8,
-                builder: (BuildContext context, s){
-                  return Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 10
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)
-                      ),
-                      boxShadow: [BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 10
-                      )]
-                    ),
-                    child: ListView(
-                      controller: s,
-                      children: <Widget>[
-                        Text("data"),
-                        Text("data"),
-                        Text("data"),
-                        Text("data"),
-                      ],
-                    ),
-                  );
-                }),
-          )
-        ],
-      ),
-    );
   }
 }
