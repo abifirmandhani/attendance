@@ -1,27 +1,15 @@
 part of 'pages.dart';
 
 class MapPage extends StatefulWidget {
+  final Jadwal jadwal;
+
+  MapPage(this.jadwal);
+
   @override
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: MapWidget(),
-      ),
-    );
-  }
-}
-
-class MapWidget extends StatefulWidget {
-  @override
-  _MapWidgetState createState() => _MapWidgetState();
-}
-
-class _MapWidgetState extends State<MapWidget> {
   GoogleMapController mapController;
   StreamSubscription<Position> streamSubscription;
   Position currentPosition;
@@ -49,16 +37,13 @@ class _MapWidgetState extends State<MapWidget> {
         icon: BitmapDescriptor.defaultMarker,
       ),
     );
-    _circles.add(
-      Circle(
+    _circles.add(Circle(
         circleId: CircleId("1"),
         center: LatLng(-1.2335883, 116.8966843),
-        radius: 50,
+        radius: minDistance,
         fillColor: accentColor.withOpacity(0.3),
         strokeColor: accentColor.withOpacity(0.3),
-        strokeWidth: 1
-      )
-    );
+        strokeWidth: 1));
     super.initState();
   }
 
@@ -96,7 +81,7 @@ class _MapWidgetState extends State<MapWidget> {
     streamSubscription = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.best, distanceFilter: 1)
         .listen((Position position) {
-          calculateDistance(position);
+      calculateDistance(position);
       CameraPosition newPos = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
           zoom: 19.151926040649414);
@@ -104,9 +89,9 @@ class _MapWidgetState extends State<MapWidget> {
     });
   }
 
-
-  void calculateDistance(Position position){
-    double distance = Geolocator.distanceBetween(position.latitude, position.longitude, schoolLocation.latitude, schoolLocation.longitude);
+  void calculateDistance(Position position) {
+    double distance = Geolocator.distanceBetween(position.latitude,
+        position.longitude, schoolLocation.latitude, schoolLocation.longitude);
     setState(() {
       jarak = distance.toInt();
     });
@@ -136,105 +121,140 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(children: <Widget>[
-        SizedBox.expand(
-            child: GoogleMap(
-          myLocationEnabled: true,
-          initialCameraPosition: _kGooglePlex,
-          mapType: MapType.normal,
-          markers: _markers,
-          circles: _circles,
-          onMapCreated: (GoogleMapController controller) {
-            mapController = controller;
-          },
-        )),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.all(20),
-            child: Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    jarak == null ? "... Meter" : jarak.toString()+" Meter",
-                    style: blackFonts.copyWith(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w700,
-                        color: accentColor),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  foto == null
-                      ? InkWell(
-                          onTap: () {
-                            getPhoto();
-                          },
-                          child: Row(
-                            children: [
-                              Icon(Icons.add_a_photo_outlined,
-                                  color: Colors.amber),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text("Ambil Foto",
-                                  style: blackFonts.copyWith(
-                                      color: Colors.amber,
-                                      fontWeight: FontWeight.w600)),
-                            ],
-                          ),
-                        )
-                      : Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.grey.withOpacity(0.6)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12))),
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
+    return BlocListener<AbsenBloc, AbsenState>(
+      listener: (context, state) {
+        print("masuk");
+        if (state is AbsenSuccess) {
+          Flushbar(
+            message: state.message,
+            backgroundColor: mainColor,
+            duration: Duration(seconds: 3),
+            flushbarPosition: FlushbarPosition.BOTTOM,
+          )..show(context);
+        } else if (state is AbsenError) {
+          Flushbar(
+            message: state.message,
+            backgroundColor: mainColor,
+            duration: Duration(seconds: 3),
+            flushbarPosition: FlushbarPosition.BOTTOM,
+          )..show(context);
+        }
+      },
+      child: BlocBuilder<AbsenBloc, AbsenState>(
+        builder: (context, state) {
+          return Scaffold(
+            body: Stack(children: <Widget>[
+              SizedBox.expand(
+                  child: GoogleMap(
+                myLocationEnabled: true,
+                initialCameraPosition: _kGooglePlex,
+                mapType: MapType.normal,
+                markers: _markers,
+                circles: _circles,
+                onMapCreated: (GoogleMapController controller) {
+                  mapController = controller;
+                },
+              )),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  margin: EdgeInsets.all(20),
+                  child: Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          jarak == null
+                              ? "... Meter"
+                              : jarak.toString() + " Meter",
+                          style: blackFonts.copyWith(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w700,
+                              color: accentColor),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        foto == null
+                            ? InkWell(
+                                onTap: () {
+                                  getPhoto();
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.add_a_photo_outlined,
+                                        color: Colors.amber),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Ambil Foto",
+                                        style: blackFonts.copyWith(
+                                            color: Colors.amber,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.6)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(5),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons.image),
-                                      SizedBox(
-                                        width: 5,
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.image),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Foto kelas.jpg")
+                                          ],
+                                        ),
                                       ),
-                                      Text("Foto kelas.jpg")
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            foto = null;
+                                          });
+                                        },
+                                        child: Icon(Icons.close),
+                                      )
                                     ],
                                   ),
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      foto = null;
-                                    });
-                                  },
-                                  child: Icon(Icons.close),
-                                )
-                              ],
-                            ),
-                          ),
+                              ),
+                        SizedBox(
+                          height: 10,
                         ),
-                  SizedBox(
-                    height: 10,
+                        state is AbsenLoading
+                            ? SpinKitFadingCircle(
+                                color: mainColor,
+                              )
+                            : ButtonWidget("Absen", mainColor, () {
+                                context
+                                    .read<AbsenBloc>()
+                                    .add(AddAbsen(widget.jadwal, foto, jarak.toDouble()));
+                              })
+                      ],
+                    ),
                   ),
-                  ButtonWidget("Absen", mainColor, () {})
-                ],
-              ),
-            ),
-          ),
-        )
-      ]),
+                ),
+              )
+            ]),
+          );
+        },
+      ),
     );
   }
 }

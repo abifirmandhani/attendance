@@ -113,7 +113,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       children: [
                                         lottie.Lottie.asset("assets/empty.json",
                                             width: 100, height: 100),
-                                        Text("Tidak ada jadwal", style: blackFonts.copyWith(fontSize: 16),)
+                                        Text(
+                                          "Tidak ada jadwal",
+                                          style:
+                                              blackFonts.copyWith(fontSize: 16),
+                                        )
                                       ],
                                     )
                                   : Column(
@@ -219,8 +223,19 @@ class _HomeWidgetState extends State<HomeWidget> {
                     SizedBox(
                       height: 10,
                     ),
-                    ButtonWidget("Absensi", mainColor, () {
-                      Navigator.pushNamed(context, MapRoute);
+                    ButtonWidget("Absensi",
+                        jadwalState is JadwalLoaded ? mainColor : Colors.grey,
+                        () {
+                      jadwalState is JadwalLoaded
+                          ? Navigator.pushNamed(context, MapRoute,
+                              arguments:
+                                  jadwalState.listJadwal[0])
+                          : Flushbar(
+                              message: "Tidak ada jadwal",
+                              backgroundColor: accentColor,
+                              duration: Duration(seconds: 4),
+                              flushbarPosition: FlushbarPosition.BOTTOM,
+                            );
                     })
                   ],
                 ),

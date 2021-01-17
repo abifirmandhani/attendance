@@ -3,7 +3,7 @@ part of 'services.dart';
 class JadwalService {
   Future<dynamic> absen(Jadwal jadwal, File foto) async {
     var idGuru = UserPreference().idUser.toString();
-    var url = baseUrl + "jadwal/" + idGuru;
+    var url = baseUrl + "add";
     var uri = Uri.parse(url);
 
     var request = http.MultipartRequest("POST", uri);

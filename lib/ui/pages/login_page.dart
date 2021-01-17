@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
                     flushbarPosition: FlushbarPosition.BOTTOM,
                   )..show(context);
                 }else if(state is UserLoaded){
-                  Navigator.pushNamed(context, HomeRoute);
+                  Navigator.pushReplacementNamed(context, HomeRoute);
                 }else if(state is Userempty){
                   Flushbar(
                     backgroundColor: mainColor,

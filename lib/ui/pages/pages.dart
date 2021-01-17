@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:absensi/bloc/jadwal_bloc.dart';
 import 'package:absensi/bloc/user_bloc.dart';
+import 'package:absensi/bloc/absen_bloc.dart';
+import 'package:absensi/models/models.dart';
 import 'package:absensi/shared/shareds.dart';
 import 'package:absensi/ui/widget/widgets.dart';
 import 'package:flushbar/flushbar.dart';

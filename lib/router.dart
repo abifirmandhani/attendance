@@ -11,7 +11,7 @@ Route<dynamic> generateRoute(RouteSettings setting){
       return MaterialPageRoute(builder: (context)=> HomePage());
       break;
     case MapRoute:
-      return MaterialPageRoute(builder: (context)=> MapPage());
+      return MaterialPageRoute(builder: (context)=> MapPage(setting.arguments));
       break;
     default:
       return MaterialPageRoute(builder: (context)=> UnknownPage());
