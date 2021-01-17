@@ -111,7 +111,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Lottie.asset("assets/empty.json",
+                                        lottie.Lottie.asset("assets/empty.json",
                                             width: 100, height: 100),
                                         Text("Tidak ada jadwal", style: blackFonts.copyWith(fontSize: 16),)
                                       ],

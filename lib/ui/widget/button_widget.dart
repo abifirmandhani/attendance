@@ -9,21 +9,24 @@ class ButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration:
-          BoxDecoration(borderRadius: BorderRadius.circular(10), color: color),
+    return Material(
       child: InkWell(
+        borderRadius: BorderRadius.circular(10),
         onTap: () {
           onClickState();
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-          child: Center(
-              child: Text(
-            text,
-            style: TextStyle(color: Colors.white),
-          )),
+        child: Ink(
+          width: double.infinity,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: color),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+            child: Center(
+                child: Text(
+              text,
+              style: TextStyle(color: Colors.white),
+            )),
+          ),
         ),
       ),
     );
